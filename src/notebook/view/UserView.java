@@ -28,7 +28,10 @@ public class UserView {
                 com = null;
             }
             if (isCommand) {
-                if (com == Commands.EXIT) return;
+                if (com == Commands.EXIT) {
+                    userController.save();
+                    return;
+                }
                 switch (com) {
                     case CREATE -> {
                         User u = createUser();
@@ -53,6 +56,7 @@ public class UserView {
                         String id = prompt("Enter user id: ");
                         userController.deleteUser(id);
                     }
+                    case SAVE -> userController.save();
                 }
             }
         }

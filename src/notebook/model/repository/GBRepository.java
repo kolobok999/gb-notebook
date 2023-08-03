@@ -7,12 +7,13 @@ import java.util.Optional;
 
 public interface GBRepository {
     List<User> findAll();
+    List<User> getUsers();
     List<String> readAll();
-    void saveAll(List<String> data);
+    void save();
 
     User create(User user);
 
-    Optional<User> findById(List<User> users, Long id);
+    Optional<User> findById(Long id);
 
     Optional<User> update(Long userId, User update);
 

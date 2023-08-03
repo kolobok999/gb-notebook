@@ -12,7 +12,7 @@ import java.util.Optional;
 public class UserRepository implements GBRepository {
     private final UserMapper mapper;
     private final String fileName;
-
+    private final List<User> users;
 
     public UserRepository(String fileName) {
         this.mapper = new UserMapper();
@@ -22,7 +22,12 @@ public class UserRepository implements GBRepository {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        this.users = findAll();
+    }
 
+    @Override
+    public List<User> getUsers() {
+        return users;
     }
 
     @Override
@@ -37,22 +42,21 @@ public class UserRepository implements GBRepository {
 
     @Override
     public User create(User user) {
-        List<User> users = findAll();
         long max = 0L;
         for (User u : users) {
             long id = u.getId();
-            if (max < id){
+            if (max < id) {
                 max = id;
             }
         }
         long next = max + 1;
         user.setId(next);
         users.add(user);
-        write(users);
         return user;
     }
+
     @Override
-    public Optional <User> findById(List<User> users, Long userId) {
+    public Optional<User> findById(Long userId) {
         return users.stream()
                 .filter(u -> u.getId()
                         .equals(userId))
@@ -61,36 +65,32 @@ public class UserRepository implements GBRepository {
 
     @Override
     public Optional<User> update(Long userId, User update) {
-        List<User> users = findAll();
 
 //        На семинаре ничего не менялось, т. к. при вынесении поиска юзера, мы уже не работали с users в этом методе.
 //        Поэтому я передаю список юзеров в метод findById
-        User editUser = findById(users, userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User editUser = findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         editUser.setFirstName(update.getFirstName().equals("") ? editUser.getFirstName() : update.getFirstName());
         editUser.setLastName(update.getLastName().equals("") ? editUser.getLastName() : update.getLastName());
         editUser.setPhone(update.getPhone().equals("") ? editUser.getPhone() : update.getPhone());
-
-        write(users);
-
         return Optional.of(update);
     }
 
     @Override
     public boolean delete(Long id) {
-        List<User> users = findAll();
-        users.remove(findById(users, id).orElseThrow());
-        write(users);
+        users.remove(findById(id).orElseThrow());
         return true;
     }
 
-    private void write(List<User> users) {
+    @Override
+    public void save() {
         List<String> lines = new ArrayList<>();
-        for (User u: users) {
+        for (User u : users) {
             lines.add(mapper.toInput(u));
         }
         this.saveAll(lines);
     }
+
 
     @Override
     public List<String> readAll() {
@@ -120,8 +120,7 @@ public class UserRepository implements GBRepository {
         return lines;
     }
 
-    @Override
-    public void saveAll(List<String> data) {
+    private void saveAll(List<String> data) {
         try (FileWriter writer = new FileWriter(fileName, false)) {
             for (String line : data) {
                 // запись всей строки
