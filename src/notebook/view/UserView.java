@@ -34,8 +34,7 @@ public class UserView {
                 }
                 switch (com) {
                     case CREATE -> {
-                        User u = createUser();
-                        userController.saveUser(u);
+                        userController.createUser(prompt("Имя: "), prompt("Фамилия: "), prompt("Номер телефона: "));
                     }
                     case READ -> {
                         String id = prompt("Идентификатор пользователя: ");
@@ -50,7 +49,7 @@ public class UserView {
                     case SHOW_LIST -> System.out.println(userController.readAll());
                     case UPDATE -> {
                         String userId = prompt("Enter user id: ");
-                        userController.updateUser(userId, createUser());
+                        userController.updateUser(userId, prompt("Имя: "), prompt("Фамилия: "), prompt("Номер телефона: "));
                     }
                     case DELETE -> {
                         String id = prompt("Enter user id: ");
@@ -66,12 +65,5 @@ public class UserView {
         Scanner in = new Scanner(System.in);
         System.out.print(message);
         return in.nextLine();
-    }
-
-    private User createUser() {
-        String firstName = prompt("Имя: ");
-        String lastName = prompt("Фамилия: ");
-        String phone = prompt("Номер телефона: ");
-        return new User(firstName, lastName, phone);
     }
 }

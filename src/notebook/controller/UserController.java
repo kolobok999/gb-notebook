@@ -12,17 +12,17 @@ public class UserController {
         this.repository = repository;
     }
 
-    public void saveUser(User user) {
-        repository.create(user);
+    public void createUser(String firstName, String lastName, String phone) {
+        repository.create(new User(firstName, lastName, phone));
+
     }
 
     public User readUser(Long userId) throws Exception {
         return repository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public void updateUser(String userId, User update) {
-        update.setId(Long.parseLong(userId));
-        repository.update(Long.parseLong(userId), update);
+    public void updateUser(String userId, String firstName, String lastName, String phone) {
+        repository.update(Long.parseLong(userId), new User(firstName, lastName, phone));
     }
 
     public void deleteUser(String userId) {
