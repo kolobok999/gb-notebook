@@ -18,26 +18,42 @@ public class UserView {
 
         while (true) {
             String command = prompt("Введите команду: ");
-            com = Commands.valueOf(command);
-            if (com == Commands.EXIT) return;
-            switch (com) {
-                case CREATE:
-                    User u = createUser();
-                    userController.saveUser(u);
-                    break;
-                case READ:
-                    String id = prompt("Идентификатор пользователя: ");
-                    try {
-                        User user = userController.readUser(Long.parseLong(id));
-                        System.out.println(user);
-                        System.out.println();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+
+            boolean isCommand = true;
+            try {
+                com = Commands.valueOf(command.toUpperCase()); // Добавил ввод любыми
+            }catch (IllegalArgumentException ex) {
+                isCommand = false;
+                System.out.println("Такой команды не существует");
+                com = null;
+            }
+            if (isCommand) {
+                if (com == Commands.EXIT) return;
+                switch (com) {
+                    case CREATE -> {
+                        User u = createUser();
+                        userController.saveUser(u);
                     }
-                    break;
-                case UPDATE:
-                    String userId = prompt("Enter user id: ");
-                    userController.updateUser(userId, createUser());
+                    case READ -> {
+                        String id = prompt("Идентификатор пользователя: ");
+                        try {
+                            User user = userController.readUser(Long.parseLong(id));
+                            System.out.println(user);
+                            System.out.println();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    case SHOW_LIST -> System.out.println(userController.readAll());
+                    case UPDATE -> {
+                        String userId = prompt("Enter user id: ");
+                        userController.updateUser(userId, createUser());
+                    }
+                    case DELETE -> {
+                        String id = prompt("Enter user id: ");
+                        userController.deleteUser(id);
+                    }
+                }
             }
         }
     }
